@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable">
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
+
+  <Commands package="guidMyNovelPackage">
+    <Groups>
+      <Group guid="guidMyNovelCmdSet" id="MyNovelToolsGroup" priority="0x0700">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/>
+      </Group>
+      <Group guid="guidMyNovelCmdSet" id="MyNovelCtxGroup" priority="0x0800">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ITEMNODE"/>
+      </Group>
+      <Group guid="guidMyNovelCmdSet" id="MyNovelCodeWinGroup" priority="0x0800">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>
+      </Group>
+    </Groups>
+
+    <Buttons>
+      <Button guid="guidMyNovelCmdSet" id="cmdidOpenNovel" priority="0x0100" type="Button">
+        <Parent guid="guidMyNovelCmdSet" id="MyNovelToolsGroup"/>
+        <Strings>
+          <ButtonText>mynovel: 打开小说...</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidMyNovelCmdSet" id="cmdidToggleWindow" priority="0x0200" type="Button">
+        <Parent guid="guidMyNovelCmdSet" id="MyNovelToolsGroup"/>
+        <Strings>
+          <ButtonText>mynovel: 显示/隐藏阅读窗口</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidMyNovelCmdSet" id="cmdidReadThisFile" priority="0x0100" type="Button">
+        <Parent guid="guidMyNovelCmdSet" id="MyNovelCtxGroup"/>
+        <Strings>
+          <ButtonText>用 mynovel 阅读</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+  <CommandPlacements>
+    <CommandPlacement guid="guidMyNovelCmdSet" id="cmdidReadThisFile" priority="0x0100">
+      <Parent guid="guidMyNovelCmdSet" id="MyNovelCodeWinGroup"/>
+    </CommandPlacement>
+  </CommandPlacements>
+
+  <KeyBindings>
+    <KeyBinding guid="guidMyNovelCmdSet" id="cmdidOpenNovel" editor="guidVSStd97" key1="0x4E" mod1="Control Alt"/>
+    <KeyBinding guid="guidMyNovelCmdSet" id="cmdidToggleWindow" editor="guidVSStd97" key1="0x48" mod1="Control Alt"/>
+  </KeyBindings>
+
+  <Symbols>
+    <GuidSymbol name="guidMyNovelPackage" value="{9f3c1e2a-5b7d-4a61-9c2e-8d4f1b6a7c31}"/>
+    <GuidSymbol name="guidMyNovelCmdSet" value="{4c2a8e71-3d95-4b6f-a1c8-7e5b2d9f0a13}">
+      <IDSymbol name="cmdidOpenNovel" value="0x0100"/>
+      <IDSymbol name="cmdidToggleWindow" value="0x0101"/>
+      <IDSymbol name="cmdidReadThisFile" value="0x0102"/>
+      <IDSymbol name="MyNovelToolsGroup" value="0x1020"/>
+      <IDSymbol name="MyNovelCtxGroup" value="0x1021"/>
+      <IDSymbol name="MyNovelCodeWinGroup" value="0x1022"/>
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>
