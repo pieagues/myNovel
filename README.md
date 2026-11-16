@@ -40,13 +40,23 @@ powershell -ExecutionPolicy Bypass -File build.ps1
 
 ## 安装
 
-关闭所有 Visual Studio 实例后执行：
+支持的 IDE：Visual Studio 2022（17.0 及以上，Community / Professional / Enterprise）与 Visual Studio 2026（18.x），x64 与 ARM64 均可。
+
+1. **先完全退出 Visual Studio**（`文件 → 退出`，并确认任务管理器里没有 `devenv.exe`）——安装器在 IDE 运行时无法写入扩展目录。
+2. 双击 `MyNovel.vsix`，或执行：
 
 ```powershell
-& "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\VSIXInstaller.exe" "dist\MyNovel.vsix"
+& "${env:ProgramFiles}\Microsoft Visual Studio\2022\Community\Common7\IDE\VSIXInstaller.exe" "dist\MyNovel.vsix"
 ```
 
-也可以直接双击 `MyNovel.vsix`，或从 VS 的「扩展 → 管理扩展」安装。
+   装在非默认路径时，先找到本机的安装器所在目录再执行。
+3. 安装器可能弹出**「此扩展可能不稳定或与当前 Visual Studio 版本不兼容」**的警告。这是因为扩展未做代码签名、且清单声明的版本区间较宽，属于保守提示，**勾选继续安装即可**，不影响使用。
+4. 若 Windows SmartScreen 提示「未知发布者」，选择「更多信息 → 仍要运行」。
+5. 重启 Visual Studio，按 `Ctrl+Alt+N` 打开小说。
+
+卸载：`扩展 → 管理扩展 → 已安装`，找到 mynovel 点「卸载」。
+
+> 注：Visual Studio 2019（16.x）不受支持。扩展依赖 17.0 才引入的 Shell 程序集版本，在 16.x 上会因绑定失败而无法加载。
 
 ## 数据位置
 

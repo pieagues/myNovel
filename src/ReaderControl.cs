@@ -85,7 +85,7 @@ namespace MyNovel
 
             var bodyHost = new Border
             {
-                Padding = new Thickness(22, 16, 22, 8),
+                Padding = new Thickness(16, 10, 16, 6),
                 Child = _body
             };
             root.Children.Add(bodyHost);
@@ -299,8 +299,8 @@ namespace MyNovel
                 var ft = new FormattedText("国Ag", CultureInfo.CurrentUICulture, FlowDirection.LeftToRight,
                     new Typeface(_fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
                     _fontSizePx, _foreground, VisualTreeHelper.GetDpi(this).PixelsPerDip);
-                // 行距放到 1.5 倍：中文长文行间留白不足会显得拥挤发闷
-                _lineHeight = Math.Ceiling(ft.Height * 1.5);
+                // 行距收在 1.25 倍：既要行间不粘，也不能拉得太散显得松散显眼
+                _lineHeight = Math.Ceiling(ft.Height * 1.25);
             }
             catch
             {
@@ -439,7 +439,8 @@ namespace MyNovel
         {
             double w = ActualWidth;
             if (w <= 1) w = 900;
-            return Math.Max(200, w - 48);   // 减去左右内边距（22×2）与滚动条余量
+            // 32 = 左右内边距 16×2；再留 12px 余量吸收像素取整，避免行尾最后一个字被裁掉
+            return Math.Max(200, w - 32 - 12);
         }
 
         /// <summary>正文可用高度，同样不能沿用 TextBlock 自身高度，否则每页行数会被上一页锁死。</summary>
@@ -447,7 +448,7 @@ namespace MyNovel
         {
             double h = ActualHeight;
             if (h <= 1) h = 420;
-            return Math.Max(80, h - 46);    // 减去上下内边距（16 + 8）与底部状态栏
+            return Math.Max(80, h - 38);    // 减去上下内边距（10 + 6）与底部状态栏
         }
 
         /// <summary>按比例把前景色往背景色混合，得到柔和一些的文字色。</summary>
@@ -483,10 +484,13 @@ namespace MyNovel
 
         private double MeasureWidth(string s)
         {
+            // 必须与正文渲染使用同一套字形模式（Display）。若这里用默认的 Ideal 模式测量，
+            // 而正文按 Display 渲染，前者算出的宽度会略小于实际绘制宽度，最后一个字就会被右边缘切掉。
             var ft = new FormattedText(s, CultureInfo.CurrentUICulture, FlowDirection.LeftToRight,
                 new Typeface(_fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
-                _fontSizePx, _foreground, VisualTreeHelper.GetDpi(this).PixelsPerDip);
-            return ft.Width;
+                _fontSizePx, _foreground, null, TextFormattingMode.Display,
+                VisualTreeHelper.GetDpi(this).PixelsPerDip);
+            return ft.WidthIncludingTrailingWhitespace;
         }
 
         private void UpdateStatus()
@@ -543,16 +547,22 @@ namespace MyNovel
             JumpToChapterEnd(chapter - 1);
         }
 
-        /// <summary>跳到指定章节的最后一页：以该章为锚点分页，取最后一页起点。</summary>
+        /// <summary>跳到指定章节的最后一页：只在本章范围内分页，绝不扫描到后续章节。</summary>
         private void JumpToChapterEnd(int chapter)
         {
             if (_doc == null || chapter < 0 || chapter >= _doc.Chapters.Count) return;
 
-            RebuildCacheFrom(_doc.Chapters[chapter].Offset);
-            EnsurePageCacheAt(MaxCachedPages - 1);
+            int chapterStart = _doc.Chapters[chapter].Offset;
+            int chapterEnd = chapter + 1 < _doc.Chapters.Count
+                ? _doc.Chapters[chapter + 1].Offset
+                : _doc.Text.Length;
 
-            if (_pageStarts.Count == 0) return;
-            _pageStart = _pageStarts[_pageStarts.Count - 1];
+            RebuildCacheFrom(chapterStart);
+            // 让 PageIndexAt 算到"覆盖本章末尾的那一页"就停，不会把后续章节全部塞进缓存
+            int idx = PageIndexAt(Math.Max(chapterStart, chapterEnd - 1));
+            if (idx < 0) return;
+
+            _pageStart = _pageStarts[idx];
             RenderPage();
             ScheduleSave();
         }
@@ -623,6 +633,8 @@ namespace MyNovel
         private void EnsurePageCacheAt(int index)
         {
             if (_doc == null) return;
+            // 防御性：任何调用方误传超大 index 时，上限钳死在 MaxCachedPages 内
+            if (index >= MaxCachedPages) index = MaxCachedPages - 1;
             string text = _doc.Text;
 
             while (_pageStarts.Count <= index && _pageStarts.Count < MaxCachedPages)

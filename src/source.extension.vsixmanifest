@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011">
   <Metadata>
-    <Identity Id="myNovel.Reader" Version="1.0.5" Language="en-US" Publisher="myNovel" />
+    <Identity Id="myNovel.Reader" Version="1.0.9" Language="en-US" Publisher="myNovel" />
     <DisplayName>mynovel</DisplayName>
-    <Description xml:space="preserve">在 Visual Studio 2022 中阅读 TXT 小说。配色与字体跟随 IDE 主题和编辑器设置，支持分页、目录跳转、阅读位置记忆、滚轮翻页和一键隐藏。</Description>
+    <Description xml:space="preserve">在 Visual Studio 2022 / 2026 中阅读 TXT 小说。配色与字体跟随 IDE 主题和编辑器设置，支持分页、目录跳转、阅读位置记忆、滚轮翻页和一键隐藏。</Description>
   </Metadata>
   <Installation>
-    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,18.0)">
+    <!-- 17.x 覆盖 Visual Studio 2022 的全部版本（Community / Professional / Enterprise），18.x 为 2026 -->
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,19.0)">
       <ProductArchitecture>amd64</ProductArchitecture>
+      <ProductArchitecture>arm64</ProductArchitecture>
     </InstallationTarget>
   </Installation>
   <Dependencies>
